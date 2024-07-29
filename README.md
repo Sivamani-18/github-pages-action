@@ -10,7 +10,7 @@ Refer to the [documentation](https://github.com/Sivamani-18/github-pages-action#
 
 | Input              | Description                                | Required | Default             |
 |--------------------|--------------------------------------------|----------|---------------------|
-| `token`            | GitHub token                               | `true`   |                     |
+| `token`            | GitHub token                               | `false`   |                     |
 | `deploy_key`       | Deploy key                                 | `false`  |                     |
 | `personal_token`   | Personal access token                      | `false`  |                     |
 | `commit_message`   | Commit message                             | `true`   | `Deploy to GitHub Pages` |
@@ -18,8 +18,8 @@ Refer to the [documentation](https://github.com/Sivamani-18/github-pages-action#
 | `external_repository` | External repository name                 | `true`   |                     |
 | `publish_branch`   | Branch to publish to                       | `true`   | `gh-pages`          |
 | `force_orphan`     | Force orphan branch                        | `false`  | `false`             |
-| `user_name`        | Git username                               | `true`   | `github-actions`    |
-| `user_email`       | Git email                                  | `true`   | `github-actions@github.com` |
+| `user_name`        | Git username                               | `false`   | `github-actions`    |
+| `user_email`       | Git email                                  | `false`   | `github-actions@github.com` |
 | `tag_name`         | Tag name                                   | `false`  |                     |
 | `tag_message`      | Tag message                                | `false`  |                     |
 | `disable_nojekyll` | Disable Jekyll                             | `false`  | `false`             |
@@ -55,10 +55,14 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        uses: Sivamani-18/github-pages-action@v1.0.0
+        uses: Sivamani-18/github-pages-action@v1.0.1
         with:
           github_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: '.next'
+          publish_dir: './out'
+          user_name: 'Your Name'
+          user_email: 'your-email@example.com'
+
+
 
 ```
 
