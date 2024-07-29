@@ -46,7 +46,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
@@ -55,11 +55,11 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        uses: Sivaqmani-18/actions-gh-pages@v1.0.0
+        uses: Sivamani-18/github-pages-action@v1.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          build_command: 'npm run build'
-          publish_dir: 'build'
+          github_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: '.next'
+
 ```
 
 ## Development
