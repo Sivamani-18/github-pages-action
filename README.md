@@ -4,7 +4,7 @@ This GitHub Action deploys a project to GitHub Pages.
 
 ## Usage
 
-Refer to the [documentation](https://github.com/Sivaqmani-18/actions-gh-pages#readme) for detailed usage instructions.
+Refer to the [documentation](https://github.com/Sivaqmani-18/github-pages-action#readme) for detailed usage instructions.
 
 ## Inputs
 
