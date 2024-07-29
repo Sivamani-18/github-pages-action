@@ -19,7 +19,7 @@ import { getWorkDirName, addNoJekyll, addCNAME, skipOnFork } from './utils';
 export async function run(): Promise<void> {
   try {
     core.info(
-      '[INFO] Usage https://github.com/Sivaqmani-18/github-pages-action#readme'
+      '[INFO] Usage https://github.com/Sivamani-18/github-pages-action#readme'
     );
 
     const inps: Inputs = getInputs();
