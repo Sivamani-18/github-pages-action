@@ -3,7 +3,7 @@ description: >
   GitHub Actions for deploying static files to GitHub Pages. This action
   supports various static site generators and allows seamless publishing
   of your site with enhanced configuration options.
-author: 'peaceiris'
+author: 'sivamani'
 runs:
   using: 'node20'
   main: 'lib/index.js'
@@ -11,6 +11,9 @@ branding:
   icon: 'upload-cloud'
   color: 'blue'
 inputs:
+  token:
+    description: 'Token for pushing to the remote branch.'
+    required: true
   deploy_key:
     description: 'SSH private key from repository secret for pushing to the remote branch.'
     required: false
