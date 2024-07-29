@@ -5,10 +5,10 @@ import * as main from './main';
   try {
     await main.run();
   } catch (error) {
-    if (error instanceof Error) {
-      core.setFailed(`Action failed with "${error.message}"`);
-    } else {
-      core.setFailed('Unexpected error');
-    }
+    core.setFailed(
+      error instanceof Error
+        ? `Action failed with "${error.message}"`
+        : 'Unexpected error'
+    );
   }
 })();

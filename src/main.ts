@@ -1,8 +1,6 @@
-// src/main.ts
 import { context } from '@actions/github';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
-import * as github from '@actions/github';
 import { Inputs } from './interfaces';
 import { showInputs, getInputs } from './get-inputs';
 import { setTokens } from './set-tokens';
@@ -22,9 +20,9 @@ export async function run(): Promise<void> {
       '[INFO] Usage https://github.com/Sivamani-18/github-pages-action#readme'
     );
 
-    const inps: Inputs = getInputs();
+    const inputs: Inputs = getInputs();
     core.startGroup('Dump inputs');
-    showInputs(inps);
+    showInputs(inputs);
     core.endGroup();
 
     if (core.isDebug()) {
@@ -33,18 +31,19 @@ export async function run(): Promise<void> {
       core.endGroup();
     }
 
-    const eventName = context.eventName;
+    const { eventName } = context;
     if (eventName === 'pull_request' || eventName === 'push') {
       const isForkRepository = (context.payload as any).repository.fork;
-      const isSkipOnFork = await skipOnFork(
-        isForkRepository,
-        inps.GithubToken,
-        inps.DeployKey,
-        inps.PersonalToken
-      );
-      if (isSkipOnFork) {
+      if (
+        await skipOnFork(
+          isForkRepository,
+          inputs.GithubToken,
+          inputs.DeployKey,
+          inputs.PersonalToken
+        )
+      ) {
         core.warning(
-          'This action runs on a fork and not found auth token, Skip deployment'
+          'This action runs on a fork and no auth token found. Skipping deployment.'
         );
         core.setOutput('skip', 'true');
         return;
@@ -52,58 +51,46 @@ export async function run(): Promise<void> {
     }
 
     core.startGroup('Setup auth token');
-    const remoteURL = await setTokens(inps);
+    const remoteURL = await setTokens(inputs);
     core.debug(`remoteURL: ${remoteURL}`);
     core.endGroup();
 
     core.startGroup('Prepare publishing assets');
-    const date = new Date();
-    const unixTime = date.getTime();
-    const workDir = await getWorkDirName(`${unixTime}`);
-    await setRepo(inps, remoteURL, workDir);
-    await addNoJekyll(workDir, inps.DisableNoJekyll);
-    await addCNAME(workDir, inps.CNAME);
+    const workDir = await getWorkDirName(`${Date.now()}`);
+    await setRepo(inputs, remoteURL, workDir);
+    await addNoJekyll(workDir, inputs.DisableNoJekyll);
+    await addCNAME(workDir, inputs.CNAME);
     core.endGroup();
 
     core.startGroup('Setup Git config');
-    try {
-      await exec.exec('git', ['remote', 'rm', 'origin']);
-    } catch (error) {
-      if (error instanceof Error) {
-        core.info(`[INFO] ${error.message}`);
-      } else {
-        throw new Error('Unexpected error');
-      }
-    }
+    await exec
+      .exec('git', ['remote', 'rm', 'origin'])
+      .catch((error) => core.info(`[INFO] ${error.message}`));
     await exec.exec('git', ['remote', 'add', 'origin', remoteURL]);
     await exec.exec('git', ['add', '--all']);
-    await setCommitAuthor(inps.UserName, inps.UserEmail);
+    await setCommitAuthor(inputs.UserName, inputs.UserEmail);
     core.endGroup();
 
     core.startGroup('Create a commit');
     const hash = `${process.env.GITHUB_SHA}`;
-    const baseRepo = `${github.context.repo.owner}/${github.context.repo.repo}`;
-    const commitMessage = await getCommitMessage(
-      inps.CommitMessage,
-      inps.FullCommitMessage,
-      inps.ExternalRepository,
+    const baseRepo = `${context.repo.owner}/${context.repo.repo}`;
+    const commitMessage = getCommitMessage(
+      inputs.CommitMessage,
+      inputs.FullCommitMessage,
+      inputs.ExternalRepository,
       baseRepo,
       hash
     );
-    await commit(inps.AllowEmptyCommit, commitMessage);
+    await commit(inputs.AllowEmptyCommit, commitMessage);
     core.endGroup();
 
     core.startGroup('Push the commit or tag');
-    await push(inps.PublishBranch, inps.ForceOrphan);
-    await pushTag(inps.TagName, inps.TagMessage);
+    await push(inputs.PublishBranch, inputs.ForceOrphan);
+    await pushTag(inputs.TagName, inputs.TagMessage);
     core.endGroup();
 
     core.info('[INFO] Action successfully completed');
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error('Unexpected error');
-    }
+    core.setFailed(error instanceof Error ? error.message : 'Unexpected error');
   }
 }

@@ -1,16 +1,82 @@
 name: 'GitHub Pages Action'
-description: 'Deploys a project to GitHub Pages'
-author: 'Siva'
-inputs:
-  token:
-    description: 'GitHub token'
-    required: true
-  build_command:
-    description: 'Command to build the project'
-    required: true
-  publish_dir:
-    description: 'Directory to publish to GitHub Pages'
-    required: true
+description: >
+  GitHub Actions for deploying static files to GitHub Pages. This action
+  supports various static site generators and allows seamless publishing
+  of your site with enhanced configuration options.
+author: 'peaceiris'
 runs:
-  using: 'node12'
+  using: 'node20'
   main: 'lib/index.js'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'
+inputs:
+  deploy_key:
+    description: 'SSH private key from repository secret for pushing to the remote branch.'
+    required: false
+  github_token:
+    description: 'Generated GITHUB_TOKEN for pushing to the remote branch.'
+    required: false
+  personal_token:
+    description: 'Personal access token for pushing to the remote branch.'
+    required: false
+  publish_branch:
+    description: 'Target branch for deployment.'
+    required: false
+    default: 'gh-pages'
+  publish_dir:
+    description: 'Input directory for deployment.'
+    required: false
+    default: 'public'
+  destination_dir:
+    description: 'Destination subdirectory for deployment.'
+    required: false
+    default: ''
+  external_repository:
+    description: 'External repository in the format owner/repo.'
+    required: false
+  allow_empty_commit:
+    description: 'Whether to allow empty commits to the publication branch.'
+    required: false
+    default: 'false'
+  keep_files:
+    description: 'Whether to retain existing files in the publish branch before deploying.'
+    required: false
+    default: 'false'
+  force_orphan:
+    description: 'Create a new branch keeping only the latest commit for GitHub Pages.'
+    required: false
+    default: 'false'
+  user_name:
+    description: 'Git user.name for commits.'
+    required: false
+  user_email:
+    description: 'Git user.email for commits.'
+    required: false
+  commit_message:
+    description: 'Custom commit message with a triggered commit hash.'
+    required: false
+  full_commit_message:
+    description: 'Custom full commit message without a triggered commit hash.'
+    required: false
+  tag_name:
+    description: 'Tag name for the deployment.'
+    required: false
+  tag_message:
+    description: 'Tag message for the deployment.'
+    required: false
+  enable_jekyll:
+    description: 'Enable GitHub Pages built-in Jekyll.'
+    required: false
+    default: 'false'
+  disable_nojekyll:
+    description: 'Disable adding .nojekyll file to the publishing branch (alias for enable_jekyll).'
+    required: false
+    default: 'false'
+  cname:
+    description: 'Custom domain for the GitHub Pages site.'
+    required: false
+  exclude_assets:
+    description: 'Files or directories to exclude from the publish directory.'
+    required: false
+    default: '.github'

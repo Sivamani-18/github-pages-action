@@ -1,35 +1,57 @@
 import * as core from '@actions/core';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as io from '@actions/io';
+import path from 'path';
+import fs from 'fs';
+
+export async function getHomeDir(): Promise<string> {
+  const homedir =
+    process.platform === 'win32'
+      ? process.env['USERPROFILE'] || 'C:\\'
+      : process.env.HOME!;
+  core.debug(`homeDir: ${homedir}`);
+  return homedir;
+}
 
 export async function getWorkDirName(unixTime: string): Promise<string> {
-  const workDir = path.join(process.cwd(), `gh-pages-${unixTime}`);
-  if (!fs.existsSync(workDir)) {
-    fs.mkdirSync(workDir);
-  }
-  return workDir;
+  return path.join(await getHomeDir(), `actions_github_pages_${unixTime}`);
+}
+
+export async function createDir(dirPath: string): Promise<void> {
+  await io.mkdirP(dirPath);
+  core.debug(`Created directory ${dirPath}`);
 }
 
 export async function addNoJekyll(
   workDir: string,
   disableNoJekyll: boolean
 ): Promise<void> {
-  if (!disableNoJekyll) {
-    fs.writeFileSync(path.join(workDir, '.nojekyll'), '');
+  if (disableNoJekyll) return;
+  const filepath = path.join(workDir, '.nojekyll');
+  if (!fs.existsSync(filepath)) {
+    fs.closeSync(fs.openSync(filepath, 'w'));
+    core.info(`[INFO] Created ${filepath}`);
   }
 }
 
-export async function addCNAME(workDir: string, cname: string): Promise<void> {
-  if (cname) {
-    fs.writeFileSync(path.join(workDir, 'CNAME'), cname);
+export async function addCNAME(
+  workDir: string,
+  content: string
+): Promise<void> {
+  if (content === '') return;
+  const filepath = path.join(workDir, 'CNAME');
+  if (!fs.existsSync(filepath)) {
+    fs.writeFileSync(filepath, `${content}\n`);
+    core.info(`[INFO] Created ${filepath}`);
+  } else {
+    core.info('CNAME already exists, skip adding CNAME');
   }
 }
 
 export async function skipOnFork(
-  isFork: boolean,
+  isForkRepository: boolean,
   githubToken: string,
   deployKey: string,
   personalToken: string
 ): Promise<boolean> {
-  return isFork && !githubToken && !deployKey && !personalToken;
+  return isForkRepository && !githubToken && !deployKey && !personalToken;
 }
