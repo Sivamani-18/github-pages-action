@@ -13,7 +13,7 @@ branding:
 inputs:
   token:
     description: 'Token for pushing to the remote branch.'
-    required: true
+    required: false
   deploy_key:
     description: 'SSH private key from repository secret for pushing to the remote branch.'
     required: false
