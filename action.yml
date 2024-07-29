@@ -1,0 +1,16 @@
+name: 'GitHub Pages Action'
+description: 'Deploys a project to GitHub Pages'
+author: 'Siva'
+inputs:
+  token:
+    description: 'GitHub token'
+    required: true
+  build_command:
+    description: 'Command to build the project'
+    required: true
+  publish_dir:
+    description: 'Directory to publish to GitHub Pages'
+    required: true
+runs:
+  using: 'node12'
+  main: 'lib/index.js'
